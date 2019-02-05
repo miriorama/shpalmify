@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>spalm-image</title>
+    <style> body {padding: 0; margin: 0;} </style>
+    <script src="p5.min.js"></script>
+    <script>
+      let img;
+      let xoff = 0;
+      let noiseOffset = 0;
+      function preload() {
+        img = loadImage('img/parrot.jpg');
+        noiseOffset = img.width/150;
+      }
+
+      function setup() {
+        createCanvas(2000, 1000);   
+        pixelDensity(1);  
+        console.log(img);
+           
+        img.loadPixels();
+        img.height = 1000;
+        loadPixels();
+
+        //let nso = Math.round(map(noise(xoff), 0, 1, 0, img.width));  
+        let nsoNext = Math.round(map(noise(xoff + noiseOffset), 0, 1, 0, img.width)); 
+
+        for (let x = 0; x < width; x++) { 
+          let rnd = Math.round(random(img.width));  
+ 
+          /*do {
+            xoff += noiseOffset;
+            nsoNext = Math.round(map(noise(xoff), 0, 1, 0, img.width));  
+          } while (nsoNext==nso)
+          nso = nsoNext; */ 
+          let nso = Math.round(map(noise(xoff), 0, 1, 0, img.width));
+          xoff += noiseOffset;   
+          
+          for (let y = 0; y < height; y++) {
+            let i = (x + y * width) * 4;
+            let I = (nso + y * img.width) * 4;
+
+            pixels[i] = img.pixels[I];
+            pixels[i+1] = img.pixels[I+1];
+            pixels[i+2] = img.pixels[I+2];
+            pixels[i+3] = img.pixels[I+3];
+
+            //xoff += noiseOffset;
+          }
+        }
+        
+
+        updatePixels();
+      }
+
+      function draw() {
+        
+      }
+
+      function getPos(x, yDiff) {
+        let i = (x + y * width) * 4;
+        let ret = [];
+
+        for (let y = 0; y < height/2; y++) {            
+          
+          ret.push(pixels[i]);
+          ret.push(pixels[i+1]);
+          ret.push(pixels[i+2]);
+          ret.push(pixels[i+3]);
+        }
+
+        return ret;
+      }
+    </script>
+  </head>
+  <body>
+  </body>
+</html>
