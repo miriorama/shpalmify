@@ -3,76 +3,77 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>spalm-image</title>
-    <style> body {padding: 0; margin: 0;} </style>
+    <title>Shpalmify</title>
+    <style>
+    html {
+      height: 100%;
+    }
+     body {padding: 0; margin: 0; overflow: hidden;     
+        display: flex;
+        flex-flow: column;
+        height: 100%;
+        justify-content: center;
+        background-color: #fbfaf6;}</style>
     <script src="p5.min.js"></script>
     <script>
+      let canvas;
       let img;
       let xoff = 0;
-      let noiseOffset = 0;
-      function preload() {
-        img = loadImage('img/parrot.jpg');
-        noiseOffset = img.width/150;
+      let noiseOffset = 0.003;
+
+      function preload() {        
+        let arr = ['parrot0','parrot1','parrot2','parrot3','parrot4','octopus','human', 'peafowl', 'crawfish', 'toucan'];
+        if (localStorage.getItem('img') > arr.length - 2) {
+          localStorage.setItem('img', 0);
+        } else {
+          localStorage.setItem('img', parseInt(localStorage.getItem('img')) + 1);
+        }
+        img = loadImage('img/' + arr[localStorage.getItem('img')] + '.jpg');
       }
 
       function setup() {
-        createCanvas(2000, 1000);   
-        pixelDensity(1);  
-        console.log(img);
-           
-        img.loadPixels();
-        img.height = 1000;
+        pixelDensity(2)
+        canvas = createCanvas(windowWidth, windowHeight);
         loadPixels();
 
-        //let nso = Math.round(map(noise(xoff), 0, 1, 0, img.width));  
-        let nsoNext = Math.round(map(noise(xoff + noiseOffset), 0, 1, 0, img.width)); 
+        img.resize(windowHeight *2 , windowHeight *2);
+        img.loadPixels();
+        
+        //let nso = Math.round(map(noise(xoff), 0, 1, 0, img.width));
 
-        for (let x = 0; x < width; x++) { 
+        for (let x = 0; x < width*2; x++) { 
           let rnd = Math.round(random(img.width));  
- 
-          /*do {
-            xoff += noiseOffset;
-            nsoNext = Math.round(map(noise(xoff), 0, 1, 0, img.width));  
-          } while (nsoNext==nso)
-          nso = nsoNext; */ 
-          let nso = Math.round(map(noise(xoff), 0, 1, 0, img.width));
-          xoff += noiseOffset;   
+          let nso = Math.round(map(noise(xoff), 0, 1, 0, img.width));             
           
-          for (let y = 0; y < height; y++) {
-            let i = (x + y * width) * 4;
+          for (let y = 0; y < height*2 ; y++) {
+            let i = (x + y * width*2) * 4;
             let I = (nso + y * img.width) * 4;
 
             pixels[i] = img.pixels[I];
             pixels[i+1] = img.pixels[I+1];
             pixels[i+2] = img.pixels[I+2];
             pixels[i+3] = img.pixels[I+3];
-
-            //xoff += noiseOffset;
           }
-        }
-        
+
+          xoff += noiseOffset;
+        }       
 
         updatePixels();
+        //strokeWeight(5);
+        //rect(0, 0, width-1, height-1);
+        console.log(width, height, windowWidth, windowHeight);
+        canvas.mousePressed(function() {
+          preload();
+          setup();
+        }); 
+
       }
 
       function draw() {
         
       }
 
-      function getPos(x, yDiff) {
-        let i = (x + y * width) * 4;
-        let ret = [];
-
-        for (let y = 0; y < height/2; y++) {            
-          
-          ret.push(pixels[i]);
-          ret.push(pixels[i+1]);
-          ret.push(pixels[i+2]);
-          ret.push(pixels[i+3]);
-        }
-
-        return ret;
-      }
+      
     </script>
   </head>
   <body>
